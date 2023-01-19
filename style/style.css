@@ -1,0 +1,109 @@
+
+:root {
+    --main-text-color-primary: #43A9B6;
+  }
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+#todayBtn{
+    border-radius: 0px;
+}
+#fiveDay{
+    border-radius: 0px;
+}
+.bs-navbar-padding-y{
+    padding: 0;
+}
+.navbar-brand{
+    text-transform: uppercase;
+    color: var(--main-text-color-primary);
+}
+.main{
+  background-color:#D7D7D7;
+  padding: 10px;
+}
+.navbar{
+    padding: 0;
+}
+.section-top{
+    color: var(--main-text-color-primary);
+}
+
+.today-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    margin-bottom: 15px;
+    
+}
+.today-header span{
+    font-weight: 700;
+    font-size: 20px;
+}
+.curent-wheather{
+    display: grid;
+    grid-template-columns: repeat(3 , 1fr);
+
+}
+.curent-wheather img{
+    width: 100px;
+    height: 100px;
+}
+.curent-wheather-item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.center{
+    align-items: center;
+    justify-content: center;
+}
+.sunInf{
+    margin-left: 15px;
+}
+
+.temp{
+    font-size: 34px;
+    font-weight: 600;
+}
+
+.hourly-date-container img{
+    width: 50px;
+    height: 50px;
+}
+.hourly-date-container{
+    width: 100%;
+    text-align: center;
+}
+/* .statyc-horly-inf{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-right: 50px;
+} */
+.section-bottom ul{
+    width: 100%;
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+@media screen and (max-width:576px) {
+    .card-hourly{
+        font-size: 12px;
+    }
+    .card-hourly img{
+        width: 25px;
+        height: 25px;
+    }
+}
+@media screen and (max-width:992px) {
+    .card-hourly{
+        margin-bottom: 15px;
+    }
+}
