@@ -2,15 +2,17 @@ import { WeatherServices } from './modules/weatherServices.js'
 import { setTime } from './modules/timeService.js'
 
 const sectionTop = document.querySelector('.section-top')
+const hourlyContainer = document.querySelector('.hourly-container')
 const services = new WeatherServices()
 
 let state = ''
 
 async function innit() {
   const result = await services.getResourceByLocation().then((res) => res)
-  createTodayCard(result)
+  const { city, list } = result
+  createTodayCard(city , list)
+  rander( hourlyContainer , hourlyWeather(list) , createDayHourlyCard)
   state = result
-  createDayHourlyCard(result)
 }
 innit()
 
@@ -24,13 +26,14 @@ searchBtn.addEventListener('click', async (e) => {
   e.preventDefault()
   const value = cityinput.value
   const result = await services.getResourceByCity(value).then((res) => res)
-  createTodayCard(result)
-  console.log(result)
+  const { city, list } = result
+  createTodayCard(city , list)
+  rander( hourlyContainer , hourlyWeather(list) , createDayHourlyCard)
+  console.log(state)
 
 
 })
-function createTodayCard(data) {
-  const { city, list } = data
+function createTodayCard(city , dataArr) {
   const res = ` <div class="today-header">
 <h2>${city.name} curent weather</h2>
 <span>${getCurrentData()}</span>
@@ -38,15 +41,15 @@ function createTodayCard(data) {
 <div class="curent-wheather">
 <div class="curent-wheather-item center">
   <img src="http://openweathermap.org/img/wn/${
-    list[0].weather[0].icon
-  }@2x.png" alt="${list[0].weather[0].description}" />
-  <span>${list[0].weather[0].main}</span>
+    dataArr[0].weather[0].icon
+  }@2x.png" alt="${dataArr[0].weather[0].description}" />
+  <span>${dataArr[0].weather[0].main}</span>
 </div>
 <div class="curent-wheather-item center">
   <div>
-    <div class="temp">${convertKToC(list[0].main.temp)} &#8451</div>
+    <div class="temp">${convertKToC(dataArr[0].main.temp)} &#8451</div>
     <div class="temp-fil">Real Feel ${convertKToC(
-      list[0].main.feels_like
+      dataArr[0].main.feels_like
     )}&#8451</div>
   </div>
 </div>
@@ -62,16 +65,16 @@ sectionTop.innerHTML = res
 
 function createDayHourlyCard(item){
     return `<div class="col-12 col-lg-2 card-hourly">
-    <div class="d-flex flex-row flex-lg-column justify-content-between align-items-center">
-      <div class="time">${setTime(item.dt, true)}}</div>
+    <div class="d-flex flex-row flex-lg-column justify-content-between align-items-center box-shadow">
+      <div class="time">${setTime(item.dt, true)}</div>
       <div>
       <img src="http://openweathermap.org/img/wn/${
         item.weather[0].icon
       }@2x.png" alt="${item.weather[0].description}" />
       </div>
       <div class="time d-none d-lg-block">${item.weather[0].main}</div>
-      <div class="time">${convertKToC(item.main.temp)}<span class="d-block d-lg-none ">Temp(&#8451)</span></div>
-      <div class="time">${convertKToC(item.main.feels_like)} <span class="d-block d-lg-none ">RealFeel</span></div>
+      <div class="time">${convertKToC(item.main.temp)}&deg<span class="d-block d-lg-none ">Temp(&#8451)</span></div>
+      <div class="time">${convertKToC(item.main.feels_like)}&deg<span class="d-block d-lg-none ">RealFeel</span></div>
       <div class="time">${item.wind.speed}ESE<span class="d-block d-lg-none ">Wind(km/h)</span></div>
     </div>   
   </div>`
@@ -88,10 +91,6 @@ function rander( container , arr , createElement){
   list.forEach(item => container.innerHTML +=item)
 }
 
-
-
-
-
 function weatherToday (dataArr){
   console.log(dataArr)
   const todayData = getCurrentData()
@@ -104,4 +103,9 @@ function getCurrentData() {
   console.log(data)
   return data
 }
+
+function hourlyWeather(dataArr){
+const result = dataArr.slice(0 , 6)
+return result
+} 
 
