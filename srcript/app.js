@@ -8,8 +8,9 @@ let state = ''
 
 async function innit() {
   const result = await services.getResourceByLocation().then((res) => res)
-  rander(sectionTop, result, createTodayCard)
+  createTodayCard(result)
   state = result
+  createDayHourlyCard(result)
 }
 innit()
 
@@ -23,14 +24,14 @@ searchBtn.addEventListener('click', async (e) => {
   e.preventDefault()
   const value = cityinput.value
   const result = await services.getResourceByCity(value).then((res) => res)
-  rander(sectionTop, result, createTodayCard)
+  createTodayCard(result)
   console.log(result)
 
 
 })
 function createTodayCard(data) {
   const { city, list } = data
-  return ` <div class="today-header">
+  const res = ` <div class="today-header">
 <h2>${city.name} curent weather</h2>
 <span>${getCurrentData()}</span>
 </div>
@@ -56,27 +57,51 @@ function createTodayCard(data) {
   </div>
 </div>
 </div>`
+sectionTop.innerHTML = res
+}
+
+function createDayHourlyCard(item){
+    return `<div class="col-12 col-lg-2 card-hourly">
+    <div class="d-flex flex-row flex-lg-column justify-content-between align-items-center">
+      <div class="time">${setTime(item.dt, true)}}</div>
+      <div>
+      <img src="http://openweathermap.org/img/wn/${
+        item.weather[0].icon
+      }@2x.png" alt="${item.weather[0].description}" />
+      </div>
+      <div class="time d-none d-lg-block">${item.weather[0].main}</div>
+      <div class="time">${convertKToC(item.main.temp)}<span class="d-block d-lg-none ">Temp(&#8451)</span></div>
+      <div class="time">${convertKToC(item.main.feels_like)} <span class="d-block d-lg-none ">RealFeel</span></div>
+      <div class="time">${item.wind.speed}ESE<span class="d-block d-lg-none ">Wind(km/h)</span></div>
+    </div>   
+  </div>`
 }
 
 function convertKToC(kelvin) {
   const celsius = Math.round(kelvin - 273, 15)
   return celsius
 }
-function rander(container, date, createCard) {
-  container.innerHTML = createCard(date)
-}
-// http://openweathermap.org/img/wn/04n@2x.png
 
-// const weatherToday = (result) =>{
-//   const todayData = getCurrentData()
-//   const { list} = result
-//   const weatherToday = list.filter(item => item.dt_txt.includes(todayData))
-//   console.log(weatherToday)
-// }
+function rander( container , arr , createElement){
+  container.innerHTML = ''
+  const list = arr.map(item => createElement(item))
+  list.forEach(item => container.innerHTML +=item)
+}
+
+
+
+
+
+function weatherToday (dataArr){
+  console.log(dataArr)
+  const todayData = getCurrentData()
+  const weatherToday = dataArr.filter(item => item.dt_txt.includes(todayData))
+  return weatherToday
+}
 
 function getCurrentData() {
-  const data = new Date(Date.now()).toLocaleString().split(',')[0]
+  const data = new Date(Date.now()).toLocaleString().split(',')[0].split('.').reverse().join('-')
+  console.log(data)
   return data
 }
 
-getCurrentData()
