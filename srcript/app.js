@@ -18,7 +18,7 @@ async function innit() {
   const { list } = resultFiveDay
   createTodayCard(currentWeather)
   rander(hourlyContainer, hourlyWeather(list), createHourlyCard)
-  state = { list }
+  state = list 
 }
 
 async function wheatherFromSearch(e) {
@@ -31,7 +31,7 @@ async function wheatherFromSearch(e) {
   const { list } = result
   createTodayCard(currentWeather)
   rander(hourlyContainer, hourlyWeather(list), createHourlyCard)
-  state = { list }
+  state = list
 }
 
 function createTodayCard(currentWeather) {
@@ -107,10 +107,9 @@ function selectDay(e , time , arr) {
   cards.forEach((item) => item.classList.remove('selected-day'))
   e.currentTarget.classList.add('selected-day')
   const data = new Date(time*1000).toLocaleString().split(',')[0].split('.').reverse().join('-')
-  // const result = arr.filter(item => item.dt_txt.includes(data))
-  // console.log(result)
-
-
+  const result = arr.filter(item => item.dt_txt.includes(data))
+  console.log(result)
+  rander(hourlyContainer, result, createHourlyCard)
 }
 
 function convertKToC(kelvin) {
@@ -124,7 +123,7 @@ function rander(container, arr, createElement) {
   list.forEach((item) => container.insertAdjacentElement('beforeend', item))
 }
 
-function weatherForFourDay({ list }) {
+function weatherForFourDay( list ) {
   console.log(list)
   const todayData = getCurrentData()
   const result = list.filter(
@@ -155,7 +154,4 @@ innit()
 fiveDayBtn.addEventListener('click', () => weatherForFourDay(state))
 searchBtn.addEventListener('click', async (e) => wheatherFromSearch(e))
 
-
-
-const da = new Date(1674481461000).toLocaleString().split(',')[0].split('.').reverse().join('-')
 
