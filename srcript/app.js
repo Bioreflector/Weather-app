@@ -13,7 +13,6 @@ async function innit() {
   const currentWeather = await services
     .getByLocationCurrent()
     .then((res) => res)
-  console.log(currentWeather)
   const resultFiveDay = await services.getByLocationFiveDay().then((res) => res)
   const { list } = resultFiveDay
   createTodayCard(currentWeather)
@@ -87,10 +86,13 @@ function createHourlyCard(item) {
   return card
 }
 
-function createDaysCard(item) {
+function createDaysCard(item, index) {
   const card = document.createElement('div')
   console.log(card)
   card.classList.add('col-2', 'day-card')
+  if (!index) {
+    card.classList.add('selected-day')
+  }
   card.addEventListener('click', (e) => selectDay(e, item.dt, state))
   card.innerHTML = `
   <div class="time">${setTime(item.dt, true)}</div>
@@ -124,7 +126,7 @@ function convertKToC(kelvin) {
 
 function rander(container, arr, createElement) {
   container.innerHTML = ''
-  const list = arr.map((item) => createElement(item))
+  const list = arr.map((item, index) => createElement(item, index))
   list.forEach((item) => container.insertAdjacentElement('beforeend', item))
 }
 
@@ -146,7 +148,6 @@ function getCurrentData() {
     .split('.')
     .reverse()
     .join('-')
-  console.log(data)
   return data
 }
 
