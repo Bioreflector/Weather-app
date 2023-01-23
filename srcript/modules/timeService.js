@@ -1,9 +1,10 @@
 function convertAmPmTime(time) {
     const timeArr = time.split(':')
-    const [hours, minutes] = timeArr
+    let [hours, minutes] = timeArr
     const amOrPm = hours >= 12 ? 'pm' : 'am'
-    const convertHours = hours % 12 || 12
-    const finishTime = `${convertHours}:${minutes}${amOrPm}`
+    hours = hours % 12
+    hours = hours ? hours : 12
+    const finishTime = `${hours}:${minutes}${amOrPm}`
     console.log(finishTime)
     return finishTime
   }

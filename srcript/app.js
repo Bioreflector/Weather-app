@@ -18,7 +18,7 @@ async function innit() {
   const { list } = resultFiveDay
   createTodayCard(currentWeather)
   rander(hourlyContainer, hourlyWeather(list), createHourlyCard)
-  state = list 
+  state = list
 }
 
 async function wheatherFromSearch(e) {
@@ -65,8 +65,8 @@ function createTodayCard(currentWeather) {
 
 function createHourlyCard(item) {
   const card = document.createElement('div')
-  card.classList.add('col-12', 'col-lg-2', 'card-hourly')
-  card.innerHTML = `<div class="d-flex flex-row flex-lg-column justify-content-between align-items-center box-shadow">
+  card.classList.add('col-12', 'col-lg-2')
+  card.innerHTML = `<div class="d-flex flex-row flex-lg-column justify-content-between align-items-center card-hourly">
   <div class="time">${setTime(item.dt, true)}</div>
   <div>
   <img src="http://openweathermap.org/img/wn/${
@@ -91,7 +91,7 @@ function createDaysCard(item) {
   const card = document.createElement('div')
   console.log(card)
   card.classList.add('col-2', 'day-card')
-  card.addEventListener('click', (e) => selectDay(e , item.dt , state))
+  card.addEventListener('click', (e) => selectDay(e, item.dt, state))
   card.innerHTML = `
   <div class="time">${setTime(item.dt, true)}</div>
   <div>
@@ -102,14 +102,19 @@ function createDaysCard(item) {
   <div class="time d-none d-lg-block">${item.weather[0].main}</div> `
   return card
 }
-function selectDay(e , time , arr) {
+function selectDay(e, time, arr) {
   const cards = document.querySelectorAll('.day-card')
   cards.forEach((item) => item.classList.remove('selected-day'))
   e.currentTarget.classList.add('selected-day')
-  const data = new Date(time*1000).toLocaleString().split(',')[0].split('.').reverse().join('-')
-  const result = arr.filter(item => item.dt_txt.includes(data))
+  const data = new Date(time * 1000)
+    .toLocaleString()
+    .split(',')[0]
+    .split('.')
+    .reverse()
+    .join('-')
+  const result = arr.filter((item) => item.dt_txt.includes(data))
   console.log(result)
-  rander(hourlyContainer, result, createHourlyCard)
+  rander(hourlyContainer, hourlyWeather(result), createHourlyCard)
 }
 
 function convertKToC(kelvin) {
@@ -123,7 +128,7 @@ function rander(container, arr, createElement) {
   list.forEach((item) => container.insertAdjacentElement('beforeend', item))
 }
 
-function weatherForFourDay( list ) {
+function weatherForFourDay(list) {
   console.log(list)
   const todayData = getCurrentData()
   const result = list.filter(
@@ -153,5 +158,3 @@ function hourlyWeather(dataArr) {
 innit()
 fiveDayBtn.addEventListener('click', () => weatherForFourDay(state))
 searchBtn.addEventListener('click', async (e) => wheatherFromSearch(e))
-
-
