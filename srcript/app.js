@@ -1,16 +1,63 @@
-import { WeatherServices } from './modules/weatherServices.js'
 const sectionTop = document.querySelector('.top-container')
 const hourlyContainer = document.querySelector('.hourly-container')
 const cityinput = document.getElementById('search-city')
 const searchBtn = document.getElementById('search-btn')
-const fiveDayBtn = document.getElementById('fiveDay')
+const severalDayBtn = document.getElementById('severalDayBtn')
 const todayBtn = document.getElementById('todayBtn')
 const curentDay = document.querySelector('.current-day')
 
 let state = ''
 let currentWeatherState = ''
+// API ---------------------
+class WeatherServices {
+  _apiBase = 'https://api.openweathermap.org/data/2.5/'
+  _apiKey = 'appid=42edb80756ba984d71a5c690dc9b699f'
+  getResource = async (url) => {
+    let result = await fetch(url)
+    if (!result.ok) {
+      throw new Error(`Col not fath ${url} status : ${result.status}`)
+    }
+    return await result.json()
+  }
+  getLocation = async () => {
+    const response = await fetch('http://ip-api.com/json/?fields=61439')
+    if (!response.ok) {
+      throw new Error(`Col not fath  status : ${result.status}`)
+    }
+    const result = response.json()
+    return result
+  }
+  getByLocationCurrent = async () => {
+    const location = await this.getLocation()
+    const result = await this.getResource(
+      `${this._apiBase}weather?q=${location.city}&${this._apiKey}`
+    )
+    return result
+  } 
+  getByLocationFiveDay = async () => {
+    const location = await this.getLocation()
+    const result = await this.getResource(
+      `${this._apiBase}forecast?q=${location.city}&${this._apiKey}`
+    )
+    return result
+  }
+  getByCityNameCurrent = async (cityName) => {
+    const result = await this.getResource(
+      `${this._apiBase}weather?q=${cityName}&${this._apiKey}`
+    )
+    return result
+  }
+  getByCityNameFiveDay = async (cityName) => {
+    const result = await this.getResource(
+      `${this._apiBase}forecast?q=${cityName}&${this._apiKey}`
+    )
+    return result
+  }
+}
 const services = new WeatherServices()
+// ------------------------
 
+// Actions-----------------
 async function innit() {
   const currentWeather = await services
     .getByLocationCurrent()
@@ -23,7 +70,6 @@ async function innit() {
   currentWeatherState = currentWeather
   state = list
 }
-
 async function wheatherFromSearch(e) {
   e.preventDefault()
   const value = cityinput.value
@@ -37,7 +83,9 @@ async function wheatherFromSearch(e) {
   currentWeatherState = currentWeather
   state = list
 }
+// ---------------------------------
 
+// Create card and rader -----------
 function createTodayCard(currentWeather) {
   const { name, main, weather, sys } = currentWeather
   const res = ` <div class="today-header">
@@ -107,9 +155,20 @@ function createDaysCard(item, index) {
     item.weather[0].icon
   }@2x.png" alt="${item.weather[0].description}" />
   </div>
-  <div class="time d-none d-lg-block">${item.weather[0].main}</div> `
+  <div class='card-day-temp'>${convertKToC(item.main.temp)} &#8451</div>
+  <div class=" d-none d-lg-block">${item.weather[0].main}</div> `
   return card
 }
+
+function rander(container, arr, createElement) {
+  container.innerHTML = ''
+  const list = arr.map((item, index) => createElement(item, index))
+  list.forEach((item) => container.appendChild(item))
+}
+// ----------------------------------
+
+//Select function--------------------
+
 function selectDay(e, time, arr) {
   const cards = document.querySelectorAll('.day-card')
   cards.forEach((item) => item.classList.remove('selected-day'))
@@ -120,27 +179,17 @@ function selectDay(e, time, arr) {
   rander(hourlyContainer, hourlyWeather(dayByHourList), createHourlyCard)
 }
 
-function convertKToC(kelvin) {
-  const celsius = Math.round(kelvin - 273, 15)
-  return celsius
-}
-
-function rander(container, arr, createElement) {
-  container.innerHTML = ''
-  const list = arr.map((item, index) => createElement(item, index))
-  list.forEach((item) => container.appendChild(item))
-}
-
-function weatherForFourDay(list) {
+function weatherOfSeveralDay(list) {
   const todayData = getCurrentData()
-  const result = list.filter(
-    (item) =>
-      !item.dt_txt.includes(todayData) && item.dt_txt.includes('12:00:00')
-  )
-  console.log(result)
-  rander(sectionTop, result, createDaysCard)
+  const wheatherWithoutToday = list.filter(item => !item.dt_txt.includes(todayData))
+  console.log(wheatherWithoutToday)
+  curentDay.innerText = setDay(wheatherWithoutToday[0].dt)
+  const wheatherDaysOnlyNoon = wheatherWithoutToday.filter(item => item.dt_txt.includes('12:00:00'))
+  rander(sectionTop, wheatherDaysOnlyNoon , createDaysCard)
+  rander(hourlyContainer, hourlyWeather(wheatherWithoutToday),createHourlyCard)
 }
 // data end time ----------------------------
+
 function getCurrentData() {
   const data = new Date(Date.now()).toISOString().slice(0, 10)
   return data
@@ -177,9 +226,13 @@ function setDetaAndMonth(time) {
   })
   return `${shortNameMonth} ${day}`
 }
+// ----------------------------
 
-// -----------------------------------------
-
+// service function -----------
+function convertKToC(kelvin) {
+  const celsius = Math.round(kelvin - 273, 15)
+  return celsius
+}
 function hourlyWeather(dataArr) {
   const result = dataArr.slice(0, 6)
   return result
@@ -202,9 +255,9 @@ function directionOfTheWind(deg) {
   if (deg  == 315) return 'NW'
   if (deg > 315 && deg <= 360) return 'NNW'
 }
-
+// ----------------------------
 innit()
-fiveDayBtn.addEventListener('click', () => weatherForFourDay(state))
+severalDayBtn.addEventListener('click', () => weatherOfSeveralDay(state))
 searchBtn.addEventListener('click', async (e) => wheatherFromSearch(e))
 todayBtn.addEventListener('click' , ()=>{
   curentDay.innerText =  'Today'
