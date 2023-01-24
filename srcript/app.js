@@ -1,4 +1,5 @@
 const sectionTop = document.querySelector('.top-container')
+const sectionBottom = document.querySelector('.section-bottom')
 const hourlyContainer = document.querySelector('.hourly-container')
 const cityinput = document.getElementById('search-city')
 const searchBtn = document.getElementById('search-btn')
@@ -15,7 +16,11 @@ class WeatherServices {
   getResource = async (url) => {
     let result = await fetch(url)
     if (!result.ok) {
+      sectionTop.innerHTML = createErrorCard(result.status)
+      sectionBottom.classList.add('d-none')
       throw new Error(`Col not fath ${url} status : ${result.status}`)
+    }else{
+      sectionBottom.classList.remove('d-none')
     }
     return await result.json()
   }
@@ -33,7 +38,7 @@ class WeatherServices {
       `${this._apiBase}weather?q=${location.city}&${this._apiKey}`
     )
     return result
-  } 
+  }
   getByLocationFiveDay = async () => {
     const location = await this.getLocation()
     const result = await this.getResource(
@@ -79,6 +84,7 @@ async function wheatherFromSearch(e) {
   const result = await services.getByCityNameFiveDay(value).then((res) => res)
   const { list } = result
   createTodayCard(currentWeather)
+  curentDay.innerText = 'Today'
   rander(hourlyContainer, hourlyWeather(list), createHourlyCard)
   currentWeatherState = currentWeather
   state = list
@@ -132,9 +138,9 @@ function createHourlyCard(item) {
   <div class="time">${convertKToC(
     item.main.feels_like
   )}&deg<span class="d-block d-lg-none ">RealFeel</span></div>
-  <div class="time">${
-    item.wind.speed
-  } ${directionOfTheWind(item.wind.deg)}<span class="d-block d-lg-none ">Wind(km/h)</span></div>
+  <div class="time">${item.wind.speed} ${directionOfTheWind(
+    item.wind.deg
+  )}<span class="d-block d-lg-none ">Wind(km/h)</span></div>
 </div>`
   return card
 }
@@ -142,7 +148,7 @@ function createHourlyCard(item) {
 function createDaysCard(item, index) {
   const card = document.createElement('div')
   console.log(card)
-  card.classList.add('col-2', 'day-card')
+  card.classList.add('col-3' , 'col-sm-2', 'card-day')
   if (!index) {
     card.classList.add('selected-day')
   }
@@ -159,6 +165,15 @@ function createDaysCard(item, index) {
   <div class=" d-none d-lg-block">${item.weather[0].main}</div> `
   return card
 }
+function createErrorCard(stasus) {
+  return `<div class ="card-error">
+  <div class ='fs-1 fw-bold text-center text-danger'>${stasus}</div>
+  <div class = 'fs-3 fw-bold text-center'>
+    Query Cloud not be found.<br>
+    Please enter a different location
+  </div>
+  </div>`
+}
 
 function rander(container, arr, createElement) {
   container.innerHTML = ''
@@ -170,7 +185,7 @@ function rander(container, arr, createElement) {
 //Select function--------------------
 
 function selectDay(e, time, arr) {
-  const cards = document.querySelectorAll('.day-card')
+  const cards = document.querySelectorAll('.card-day')
   cards.forEach((item) => item.classList.remove('selected-day'))
   e.currentTarget.classList.add('selected-day')
   curentDay.innerText = setDay(time)
@@ -181,12 +196,16 @@ function selectDay(e, time, arr) {
 
 function weatherOfSeveralDay(list) {
   const todayData = getCurrentData()
-  const wheatherWithoutToday = list.filter(item => !item.dt_txt.includes(todayData))
+  const wheatherWithoutToday = list.filter(
+    (item) => !item.dt_txt.includes(todayData)
+  )
   console.log(wheatherWithoutToday)
   curentDay.innerText = setDay(wheatherWithoutToday[0].dt)
-  const wheatherDaysOnlyNoon = wheatherWithoutToday.filter(item => item.dt_txt.includes('12:00:00'))
-  rander(sectionTop, wheatherDaysOnlyNoon , createDaysCard)
-  rander(hourlyContainer, hourlyWeather(wheatherWithoutToday),createHourlyCard)
+  const wheatherDaysOnlyNoon = wheatherWithoutToday.filter((item) =>
+    item.dt_txt.includes('12:00:00')
+  )
+  rander(sectionTop, wheatherDaysOnlyNoon, createDaysCard)
+  rander(hourlyContainer, hourlyWeather(wheatherWithoutToday), createHourlyCard)
 }
 // data end time ----------------------------
 
@@ -240,28 +259,27 @@ function hourlyWeather(dataArr) {
 function directionOfTheWind(deg) {
   if (deg == 360 || deg == 0) return ' N'
   if (deg > 0 && deg < 45) return 'NNE'
-  if (deg  == 45) return 'NE'
+  if (deg == 45) return 'NE'
   if (deg > 45 && deg < 90) return 'ENE'
-  if (deg  == 90) return 'E'
+  if (deg == 90) return 'E'
   if (deg > 90 && deg < 135) return 'ESE'
-  if (deg  == 135) return 'SE'
+  if (deg == 135) return 'SE'
   if (deg > 135 && deg < 180) return 'SSE'
-  if (deg  == 180) return 'S'
+  if (deg == 180) return 'S'
   if (deg > 180 && deg < 225) return 'SSW'
-  if (deg  == 225) return 'SW'
+  if (deg == 225) return 'SW'
   if (deg > 225 && deg < 270) return 'WSW'
-  if (deg  == 270) return 'W'
+  if (deg == 270) return 'W'
   if (deg > 270 && deg <= 315) return 'WWW'
-  if (deg  == 315) return 'NW'
+  if (deg == 315) return 'NW'
   if (deg > 315 && deg <= 360) return 'NNW'
 }
 // ----------------------------
 innit()
 severalDayBtn.addEventListener('click', () => weatherOfSeveralDay(state))
 searchBtn.addEventListener('click', async (e) => wheatherFromSearch(e))
-todayBtn.addEventListener('click' , ()=>{
-  curentDay.innerText =  'Today'
+todayBtn.addEventListener('click', () => {
+  curentDay.innerText = 'Today'
   createTodayCard(currentWeatherState)
   rander(hourlyContainer, hourlyWeather(state), createHourlyCard)
 })
-

@@ -10,19 +10,16 @@
 #todayBtn {
   border-radius: 0px;
 }
-#fiveDay {
+#severalDayBtn {
   border-radius: 0px;
 }
 .bs-navbar-padding-y {
   padding: 0;
 }
-.navbar-brand {
+.title-app {
   text-transform: uppercase;
   color: var(--main-text-color-primary);
-}
-
-.navbar {
-  padding: 0;
+  font-size: 24px;
 }
 .section-top {
   color: var(--main-text-color-primary);
@@ -84,7 +81,7 @@
   padding-left: 0;
 }
 
-.day-card {
+.card-day {
   border-radius: 5px;
   background-color: var(--main-text-color-primary);
   color: white;
@@ -111,18 +108,30 @@
   border-radius: 5px;
   padding: 10px 0;
 }
-@media screen and (max-width: 576px) {
-  .card-hourly {
-    font-size: 12px;
-  }
-  .card-hourly img {
-    width: 25px;
-    height: 25px;
-  }
+.current-day{
+  color: var(--main-text-color-primary);
+  font-size: 18px;
 }
+
 @media screen and (max-width: 992px) {
   .card-hourly {
     margin-bottom: 15px;
     padding: 0 10px;
+  }
+}
+@media screen and (max-width: 576px) {
+  .card-hourly {
+    font-size: 12px;
+  }
+  .card-day img{
+    width: 50px;
+    height: 50px;
+  }
+  .card-day{
+    font-size: 14px;
+  }
+  .card-hourly img {
+    width: 25px;
+    height: 25px;
   }
 }
