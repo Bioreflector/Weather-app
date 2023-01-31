@@ -113,11 +113,13 @@ function createTodayCard(currentWeather) {
 </div>
 <div class="curent-wheather-item center">
   <div>
-    <div>Sunrise: <span class='sunInf'>${setTime(sys.sunrise)}</span></div>
-  <div>Sunset: <span class='sunInf'>${setTime(sys.sunset)}</span></div>
+    <div class = "day-inf">Sunrise: <span class='sunInf'>${setTime(sys.sunrise)}</span></div>
+    <div class = "day-inf">Sunset: <span class='sunInf'>${setTime(sys.sunset)}</span></div>
+    <div class = "day-inf">Duration: <span class='sunInf'>${setDayDuration(sys.sunrise , sys.sunset)}</span></div>
   </div>
 </div>
 </div>`
+  
   sectionTop.innerHTML = res
 }
 
@@ -234,6 +236,16 @@ function setDay(time) {
     weekday: 'long',
   })
   return day
+}
+function setDayDuration(sunrise , sunset ){
+  const dayMilisecond = sunset - sunrise
+  let mins = Math.floor(dayMilisecond*1000 / 60000)
+  const hours = Math.floor(mins / 60)
+  mins %= 60
+  if(mins < 10)
+  mins = '0' + mins
+  console.log(`${hours}:${mins}`)
+  return `${hours}:${mins} hr`
 }
 function setDetaAndMonth(time) {
   const month = new Date(time * 1000).toLocaleDateString('en-US', {
